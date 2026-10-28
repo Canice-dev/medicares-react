@@ -4,7 +4,29 @@ import doctorTwo from "../assets/doc2.png";
 import doctorThree from "../assets/doc3.png";
 import doctorFour from "../assets/doc4.jpg";
 import { Link } from "react-router-dom";
+import { useState } from "react";
+import axios from "axios";
 const Home = () => {
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const handleSubscribe = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    const response = await axios.post("http://localhost:3000/subscribe", {
+      email: email,
+    });
+    setIsLoading(false);
+
+    console.log(response.data);
+    setMessage(response.data.message);
+
+    setEmail("");
+  };
+
+  const handleChange = async (e) => {
+    setEmail(e.target.value);
+  };
   return (
     <div className="bg-white text-gray-800">
       <section className="flex md:flex-row flex-col items-center justify-between gap-5 md:gap-10 max-w-300 mx-auto px-4 py-4 md:py-6">
@@ -151,22 +173,33 @@ const Home = () => {
             delivered straight to your inbox.
           </p>
 
+          {/* Subscribe */}
           <div className="mt-6">
-            <form className="flex flex-col sm:flex-row gap-3 items-center justify-center">
+            <form
+              onSubmit={handleSubscribe}
+              className="flex flex-col sm:flex-row gap-3 items-center justify-center"
+            >
               <input
                 type="email"
+                value={email}
+                onChange={handleChange}
                 placeholder="Enter your email"
+                required
                 className="px-4 py-3 rounded-lg border border-gray-300 w-full sm:w-80 outline-none focus:ring-2 focus:ring-blue-500"
               />
 
               <button
                 id="sendBtn"
-                className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold w-full md:w-fit ${
-                  transition"
+                className={`bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold w-full md:w-fit
+                  transition ${isLoading && "cursor-not-allowed bg-blue-700/50"}`}
               >
                 Subscribe
               </button>
             </form>
+
+            {message && (
+              <p className="mt-4 text-sm text-slate-600">{message}</p>
+            )}
           </div>
         </div>
       </section>
